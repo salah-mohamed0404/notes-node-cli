@@ -8,6 +8,7 @@ import {
 	removeAllNotes,
 } from "./notes.js";
 import { listNotes } from "./utils.js";
+import { DEFAULT_PORT, startServer } from "./server.js";
 
 yargs(hideBin(process.argv))
 	.command(
@@ -80,12 +81,14 @@ yargs(hideBin(process.argv))
 		(yargs) => {
 			return yargs.positional("port", {
 				describe: "port to bind on",
-				default: 5000,
+				default: DEFAULT_PORT,
 				type: "number",
 			});
 		},
 		async (argv) => {
-			console.log("argv", argv);
+			const notes = await getAllNotes();
+
+			startServer(notes, argv.port);
 		},
 	)
 	.command(
