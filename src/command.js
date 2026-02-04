@@ -1,5 +1,13 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import {
+	getAllNotes,
+	newNote,
+	findNotes,
+	removeNote,
+	removeAllNotes,
+} from "./notes.js";
+import { listNotes } from "./utils.js";
 
 yargs(hideBin(process.argv))
 	.command(
@@ -12,7 +20,12 @@ yargs(hideBin(process.argv))
 			});
 		},
 		async (argv) => {
-			console.log("argv", argv);
+			const tags = argv.tags
+				? argv.tags.split(",").map((tag) => tag.trim())
+				: [];
+			const savedNote = await newNote(argv.note, tags);
+
+			console.log("Note saved successfully!: ", savedNote);
 		},
 	)
 	.option("tags", {
@@ -25,7 +38,9 @@ yargs(hideBin(process.argv))
 		"get all notes",
 		() => {},
 		async (argv) => {
-			console.log("argv", argv);
+			const notes = await getAllNotes();
+
+			listNotes(notes);
 		},
 	)
 	.command(
@@ -39,7 +54,9 @@ yargs(hideBin(process.argv))
 			});
 		},
 		async (argv) => {
-			console.log("argv", argv);
+			const foundNotes = await findNotes(argv.filter);
+
+			listNotes(foundNotes);
 		},
 	)
 	.command(
@@ -52,7 +69,9 @@ yargs(hideBin(process.argv))
 			});
 		},
 		async (argv) => {
-			console.log("argv", argv);
+			await removeNote(argv.id);
+
+			console.log("Note removed!");
 		},
 	)
 	.command(
@@ -74,7 +93,9 @@ yargs(hideBin(process.argv))
 		"remove all notes",
 		() => {},
 		async (argv) => {
-			console.log("argv", argv);
+			await removeAllNotes();
+
+			console.log("All notes are cleaned");
 		},
 	)
 	.demandCommand(1)
